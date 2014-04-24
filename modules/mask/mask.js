@@ -289,15 +289,38 @@ angular.module('ui.mask', [])
           }
 
           function blurHandler(){
-            oldCaretPosition = 0;
-            oldSelectionLength = 0;
-            if (!isValid || value.length === 0) {
-              valueMasked = '';
-              iElement.val('');
-              scope.$apply(function (){
-                controller.$setViewValue('');
-              });
-            }
+              oldCaretPosition = 0;
+              oldSelectionLength = 0;
+
+			  if (iElement.hasClass("date")) {
+
+                  // Allow date to be two characters
+                  if (value.length === 6) {
+                      // Get the first two digits of the year
+                      date = new Date()
+                      yr = date.getFullYear().toString().substr(0,2)
+
+                      // Expand the year to four digits
+                      value = iElement.val()
+                      value = value.substr(0,6) + yr + value.substr(6,2)
+                      iElement.val(value);
+                      // Set old values for when we refocus date
+                      oldValueUnmasked = unmaskValue(value)
+                      oldValue = maskValue(value)
+
+                      // Set the AngularJS model on the element
+                      controller.$setViewValue(oldValueUnmasked)
+                  } else if (!isValid || value.length === 0){
+                  }
+              } else {
+                  if (!isValid || value.length === 0) {
+                      valueMasked = '';
+                      iElement.val('');
+                      scope.$apply(function (){
+                          controller.$setViewValue('');
+                      });
+                  }
+              }
           }
 
           function mouseDownUpHandler(e){
